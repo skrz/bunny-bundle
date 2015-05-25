@@ -1,0 +1,39 @@
+{
+    "name": "skrz/bunny-bundle",
+    "description": "Symfony bundle that makes using RabbitMQ easy.",
+    "keywords": [
+        "rabbitmq",
+        "rabbit",
+        "bunny",
+        "amqp",
+        "messaging",
+        "message",
+        "queue",
+        "queueing",
+        "exchange",
+        "symfony",
+        "symfonyfw",
+        "bundle",
+        "symfony bundle"
+    ],
+    "minimum-stability": "stable",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jakub Kulhan",
+            "email": "jakub.kulhan@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "bunny/bunny": "~0.1",
+        "nette/php-generator": "dev-master",
+        "skrz/autowiring-bundle": "~1.0",
+        "skrz/meta": "~1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Skrz\\Bundle\\BunnyBundle\\": ""
+        }
+    }
+}
