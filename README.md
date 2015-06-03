@@ -10,26 +10,28 @@
 Add as [Composer](https://getcomposer.org/) dependency:
 
 ```sh
-$ composer require skrz/bunny-bundle:@dev
+$ composer require skrz/bunny-bundle
 ```
 
 Then add `BunnyBundle` to Symfony Kernel:
 
-    use Skrz\Bundle\BunnyBundle\SkrzBunnyBundle;
+```php
+use Skrz\Bundle\BunnyBundle\SkrzBunnyBundle;
 
-    class AppKernel
+class AppKernel
+{
+
+    public function registerBundles()
     {
-
-        public function registerBundles()
-        {
-            return [
-                ...
-                new SkrzBunnyBundle()
-                ...
-            ];
-        }
-
+        return [
+            ...
+            new SkrzBunnyBundle()
+            ...
+        ];
     }
+
+}
+```
 
 
 ## Usage
