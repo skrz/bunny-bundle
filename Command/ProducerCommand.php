@@ -4,7 +4,6 @@ namespace Skrz\Bundle\BunnyBundle\Command;
 use Skrz\Bundle\BunnyBundle\AbstractProducer;
 use Skrz\Bundle\BunnyBundle\Annotation\Producer;
 use Skrz\Bundle\BunnyBundle\BunnyManager;
-use Skrz\SkrzException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -65,7 +64,7 @@ class ProducerCommand extends Command
 
 		$this->manager->setUp();
 
-		if($input->getOption("listFile")) {
+		if ($input->getOption("listFile")) {
 			$handle = fopen($input->getOption("listFile"), "r");
 			if ($handle) {
 				while (($line = fgets($handle)) !== false) {
@@ -74,7 +73,7 @@ class ProducerCommand extends Command
 
 				fclose($handle);
 			} else {
-				throw new SkrzException("error reading file");
+				throw new \Exception("error reading file");
 			}
 		} else {
 			for ($i = 0, $count = $input->getOption("count"); $i < $count; ++$i) {
