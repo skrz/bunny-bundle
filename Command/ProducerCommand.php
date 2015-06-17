@@ -4,6 +4,7 @@ namespace Skrz\Bundle\BunnyBundle\Command;
 use Skrz\Bundle\BunnyBundle\AbstractProducer;
 use Skrz\Bundle\BunnyBundle\Annotation\Producer;
 use Skrz\Bundle\BunnyBundle\BunnyManager;
+use Skrz\SkrzException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -41,7 +42,8 @@ class ProducerCommand extends Command
 			->addArgument("producer-name", InputArgument::REQUIRED, "Name of the producer.")
 			->addArgument("message", InputArgument::REQUIRED, "Message JSON string.")
 			->addArgument("routing-key", InputArgument::OPTIONAL, "Message's routing key.", null)
-			->addOption("count", "c", InputOption::VALUE_REQUIRED, "Message will be published X times.", 1);
+			->addOption("count", "c", InputOption::VALUE_REQUIRED, "Message will be published X times.", 1)
+			->addOption("listFile", "f", InputOption::VALUE_OPTIONAL, "line separated list of ids to produce");
 	}
 
 	protected function execute(InputInterface $input, OutputInterface $output)
@@ -63,8 +65,21 @@ class ProducerCommand extends Command
 
 		$this->manager->setUp();
 
-		for ($i = 0, $count = $input->getOption("count"); $i < $count; ++$i) {
-			$producer->publish($message, $routingKey);
+		if($input->getOption("listFile")) {
+			$handle = fopen($input->getOption("listFile"), "r");
+			if ($handle) {
+				while (($line = fgets($handle)) !== false) {
+					$producer->publish(sprintf($message, trim($line)), $routingKey);
+				}
+
+				fclose($handle);
+			} else {
+				throw new SkrzException("error reading file");
+			}
+		} else {
+			for ($i = 0, $count = $input->getOption("count"); $i < $count; ++$i) {
+				$producer->publish($message, $routingKey);
+			}
 		}
 	}
 
