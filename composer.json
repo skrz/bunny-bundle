@@ -27,9 +27,8 @@
     "require": {
         "php": ">=5.4",
         "bunny/bunny": "~0.1",
-        "nette/php-generator": "dev-master",
-        "skrz/autowiring-bundle": "~1.0",
-        "skrz/meta": "~1.1"
+        "skrz/autowiring-bundle": "~1.1",
+        "skrz/meta": "~1.2"
     },
     "autoload": {
         "psr-4": {
