@@ -36,15 +36,16 @@ class BunnyCompilerPass implements CompilerPassInterface
 	/** @var AnnotationReader */
 	private $annotationReader;
 
-	public function __construct($configKey,
-	                            $clientServiceId,
-	                            $managerServiceId,
-	                            $channelServiceId,
-	                            $setupCommandServiceId,
-	                            $consumerCommandServiceId,
-	                            $producerCommandServiceId,
-	                            AnnotationReader $annotationReader)
-	{
+	public function __construct(
+		$configKey,
+		$clientServiceId,
+		$managerServiceId,
+		$channelServiceId,
+		$setupCommandServiceId,
+		$consumerCommandServiceId,
+		$producerCommandServiceId,
+		AnnotationReader $annotationReader
+	) {
 		$this->configKey = $configKey;
 		$this->clientServiceId = $clientServiceId;
 		$this->managerServiceId = $managerServiceId;
