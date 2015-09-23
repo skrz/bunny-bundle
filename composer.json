@@ -28,7 +28,7 @@
         "php": ">=5.4",
         "bunny/bunny": "~0.1",
         "skrz/autowiring-bundle": "~1.1",
-        "skrz/meta": "~1.2"
+        "skrz/meta": ">=1.2, <3.0"
     },
     "autoload": {
         "psr-4": {
