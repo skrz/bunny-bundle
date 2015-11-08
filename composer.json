@@ -30,6 +30,11 @@
         "skrz/autowiring-bundle": "~1.1",
         "skrz/meta": ">=1.2, <3.0"
     },
+    "require-dev": {
+        "phpunit/phpunit": "~4.6",
+        "symfony/framework-bundle": "~2.7",
+        "symfony/yaml": "~2.7"
+    },
     "autoload": {
         "psr-4": {
             "Skrz\\Bundle\\BunnyBundle\\": ""

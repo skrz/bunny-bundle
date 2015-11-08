@@ -1,0 +1,18 @@
+bunny:
+  exchanges:
+    producer_test_exchange:
+      type: topic
+
+  queues:
+    producer_test_queue:
+      durable: true
+      bindings:
+        - exchange: producer_test_exchange
+          routing_key: test.#
+
+services:
+  producer.protobuf:
+    class: Skrz\Bundle\BunnyBundle\Tests\Fixtures\ProtobufMessageProducer
+
+  producer.json:
+    class: Skrz\Bundle\BunnyBundle\Tests\Fixtures\JsonMessageProducer

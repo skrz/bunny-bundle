@@ -1,9 +1,10 @@
 <?php
-namespace Skrz\Bundle\BunnyBundle;
+namespace Skrz\Bundle\BunnyBundle\DependencyInjection\Compiler;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Skrz\Bundle\BunnyBundle\Annotation\Consumer;
 use Skrz\Bundle\BunnyBundle\Annotation\Producer;
+use Skrz\Bundle\BunnyBundle\BunnyException;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -60,7 +61,7 @@ class BunnyCompilerPass implements CompilerPassInterface
 	public function process(ContainerBuilder $container)
 	{
 		if (!$container->hasParameter($this->configKey)) {
-			throw new \InvalidArgumentException("Container doesn't have parameter '{$this->configKey}', BunnyExtension probably haven't processed config.");
+			throw new \InvalidArgumentException("Container doesn't have parameter '{$this->configKey}', SkrzBunnyExtension probably haven't processed config.");
 		}
 
 		$config = $container->getParameter($this->configKey);
@@ -141,6 +142,7 @@ class BunnyCompilerPass implements CompilerPassInterface
 						$annotation->immediate,
 						$annotation->meta,
 						$annotation->beforeMethod,
+						$annotation->contentType,
 						new Reference($this->managerServiceId),
 					]);
 				}

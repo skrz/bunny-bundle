@@ -1,0 +1,15 @@
+bunny:
+  exchanges:
+    consumer_test_exchange:
+      type: topic
+
+  queues:
+    consumer_test_queue:
+      durable: true
+      bindings:
+        - exchange: consumer_test_exchange
+          routing_key: test.#
+
+services:
+  consumer.test:
+    class: Skrz\Bundle\BunnyBundle\Tests\Fixtures\TestConsumer

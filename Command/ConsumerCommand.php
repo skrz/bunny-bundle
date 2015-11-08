@@ -10,11 +10,11 @@ use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use Skrz\Bundle\BunnyBundle\Annotation\Consumer;
 use Skrz\Bundle\BunnyBundle\BunnyException;
 use Skrz\Bundle\BunnyBundle\BunnyManager;
+use Skrz\Bundle\BunnyBundle\ContentTypes;
 use Skrz\Meta\JSON\JsonMetaInterface;
 use Skrz\Meta\MetaInterface;
-use Skrz\Meta\PHP\PhpMetaInterface;
+use Skrz\Meta\Protobuf\ProtobufMetaInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -103,7 +103,6 @@ class ConsumerCommand extends Command
 				}
 			}
 
-			/** @var JsonMetaInterface $meta */
 			$meta = null;
 			if ($consumerSpec->meta) {
 				/** @var MetaInterface $metaClassName */
@@ -118,10 +117,6 @@ class ConsumerCommand extends Command
 				}
 
 				$meta = $metaClassName::getInstance();
-
-				if (!($meta instanceof JsonMetaInterface)) {
-					throw new BunnyException("Meta class {$metaClassName} is not instance of JsonMetaInterface.");
-				}
 			}
 
 			if ($consumerSpec->setUpMethod && !isset($calledSetUps[$consumerSpec->setUpMethod])) {
@@ -183,14 +178,30 @@ class ConsumerCommand extends Command
 		$channel->getClient()->disconnect();
 	}
 
-	public function handleMessage($consumer, Consumer $consumerSpec, JsonMetaInterface $meta = null, Message $message, Channel $channel, Client $client)
+	public function handleMessage($consumer, Consumer $consumerSpec, $meta = null, Message $message, Channel $channel, Client $client)
 	{
 		$data = $message->content;
 		if ($meta) {
-			if ($message->getHeader("content-type") !== "application/json") {
-				throw new BunnyException("Message does not have 'content-type' header, or content type is not 'application/json'.");
+			switch ($message->getHeader("content-type")) {
+				case ContentTypes::APPLICATION_JSON:
+					if ($meta instanceof JsonMetaInterface) {
+						$data = $meta->fromJson($data);
+					} else {
+						throw new BunnyException("Meta class does not support JSON.");
+					}
+					break;
+
+				case ContentTypes::APPLICATION_PROTOBUF:
+					if ($meta instanceof ProtobufMetaInterface) {
+						$data = $meta->fromProtobuf($data);
+					} else {
+						throw new BunnyException("Meta class does not support Protobuf.");
+					}
+					break;
+
+				default:
+					throw new BunnyException("Message does not have 'content-type' header, cannot deserialize data.");
 			}
-			$data = $meta->fromJson($data);
 		}
 
 		$consumer->{$consumerSpec->method}($data, $message, $channel, $client);

@@ -46,6 +46,11 @@ final class Producer extends Component
 	/**
 	 * @var string
 	 */
+	public $contentType;
+
+	/**
+	 * @var string
+	 */
 	public $className;
 
 	public static function fromArray(array $properties)

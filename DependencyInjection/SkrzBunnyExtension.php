@@ -1,5 +1,5 @@
 <?php
-namespace Skrz\Bundle\BunnyBundle;
+namespace Skrz\Bundle\BunnyBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
@@ -7,8 +7,13 @@ use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 
-class BunnyExtension extends Extension implements ConfigurationInterface
+class SkrzBunnyExtension extends Extension implements ConfigurationInterface
 {
+
+	public function getAlias()
+	{
+		return "bunny";
+	}
 
 	public function getConfigTreeBuilder()
 	{

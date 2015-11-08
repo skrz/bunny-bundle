@@ -2,6 +2,8 @@
 namespace Skrz\Bundle\BunnyBundle;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Skrz\Bundle\BunnyBundle\DependencyInjection\Compiler\BunnyCompilerPass;
+use Skrz\Bundle\BunnyBundle\DependencyInjection\SkrzBunnyExtension;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\DependencyInjection\Compiler\PassConfig;
@@ -14,7 +16,7 @@ class SkrzBunnyBundle extends Bundle
 	public function getContainerExtension()
 	{
 		if ($this->extension === null) {
-			$this->extension = new BunnyExtension();
+			$this->extension = new SkrzBunnyExtension();
 		}
 
 		return $this->extension;
