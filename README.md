@@ -1,5 +1,6 @@
 # Skrz\Bundle\BunnyBundle
 
+[![Build Status](https://travis-ci.org/skrz/bunny-bundle.svg?branch=master)](https://travis-ci.org/skrz/bunny-bundle)
 [![Downloads this Month](https://img.shields.io/packagist/dm/skrz/bunny-bundle.svg)](https://packagist.org/packages/skrz/bunny-bundle)
 [![Latest stable](https://img.shields.io/packagist/v/skrz/bunny-bundle.svg)](https://packagist.org/packages/skrz/bunny-bundle)
 
