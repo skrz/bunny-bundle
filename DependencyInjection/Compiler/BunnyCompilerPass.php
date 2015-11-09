@@ -5,6 +5,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Skrz\Bundle\BunnyBundle\Annotation\Consumer;
 use Skrz\Bundle\BunnyBundle\Annotation\Producer;
 use Skrz\Bundle\BunnyBundle\BunnyException;
+use Skrz\Bundle\BunnyBundle\ContentTypes;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -131,6 +132,10 @@ class BunnyCompilerPass implements CompilerPassInterface
 							"{$producers[$producerName]["name"]} ({$producers[$producerName]["className"]}) " .
 							"and {$serviceId} ({$className})."
 						);
+					}
+
+					if (empty($annotation->contentType)) {
+						$annotation->contentType = ContentTypes::APPLICATION_JSON;
 					}
 
 					$producers[$producerName] = (array)$annotation;
