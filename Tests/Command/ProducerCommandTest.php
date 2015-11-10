@@ -2,6 +2,7 @@
 namespace Skrz\Bundle\BunnyBundle\Tests\Command;
 
 use Bunny\Client;
+use Bunny\Message as BunnyMessage;
 use Skrz\Bundle\BunnyBundle\ContentTypes;
 use Skrz\Bundle\BunnyBundle\SkrzBunnyBundle;
 use Skrz\Bundle\BunnyBundle\Tests\Fixtures\Message;
@@ -9,7 +10,6 @@ use Skrz\Bundle\BunnyBundle\Tests\Fixtures\Meta\MessageMeta;
 use Skrz\Bundle\BunnyBundle\Tests\Fixtures\TestKernel;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
-use Bunny\Message as BunnyMessage;
 
 class ProducerCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -77,13 +77,13 @@ class ProducerCommandTest extends \PHPUnit_Framework_TestCase
 	public function testProducerWithProtobuf()
 	{
 		$this->runWithConfig(__DIR__ . "/../Fixtures/producer.yml", [
-				"producer-name" => "ProtobufMessage",
-				"message" => MessageMeta::toJson(
-						(new Message())
-								->setIntValue(234)
-								->setFloatValue(2.41)
-								->setStringValue("test")
-				)
+			"producer-name" => "ProtobufMessage",
+			"message" => MessageMeta::toJson(
+				(new Message())
+					->setIntValue(234)
+					->setFloatValue(2.41)
+					->setStringValue("test")
+			)
 		]);
 
 		$client = new Client();
@@ -96,6 +96,34 @@ class ProducerCommandTest extends \PHPUnit_Framework_TestCase
 
 		$this->assertEquals(ContentTypes::APPLICATION_PROTOBUF, $msg->getHeader("content-type"));
 		$object = MessageMeta::fromProtobuf($msg->content);
+		$this->assertNotNull($object);
+		$this->assertEquals(234, $object->getIntValue());
+		$this->assertEquals(2.41, $object->getFloatValue());
+		$this->assertEquals("test", $object->getStringValue());
+	}
+
+	public function testEmptyExchangeProducer()
+	{
+		$this->runWithConfig(__DIR__ . "/../Fixtures/producer.yml", [
+			"producer-name" => "EmptyExchange",
+			"message" => MessageMeta::toJson(
+				(new Message())
+					->setIntValue(234)
+					->setFloatValue(2.41)
+					->setStringValue("test")
+			)
+		]);
+
+		$client = new Client();
+		$client->connect();
+		$channel = $client->channel();
+
+		/** @var BunnyMessage $msg */
+		$msg = $channel->get("producer_test_queue", true);
+		$this->assertNotNull($msg);
+
+		$this->assertEquals(ContentTypes::APPLICATION_JSON, $msg->getHeader("content-type"));
+		$object = MessageMeta::fromJson($msg->content);
 		$this->assertNotNull($object);
 		$this->assertEquals(234, $object->getIntValue());
 		$this->assertEquals(2.41, $object->getFloatValue());

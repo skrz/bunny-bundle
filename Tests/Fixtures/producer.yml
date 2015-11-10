@@ -16,3 +16,6 @@ services:
 
   producer.json:
     class: Skrz\Bundle\BunnyBundle\Tests\Fixtures\JsonMessageProducer
+
+  producer.empty_exchange:
+    class: Skrz\Bundle\BunnyBundle\Tests\Fixtures\EmptyExchangeProducer
