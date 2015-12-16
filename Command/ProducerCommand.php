@@ -2,6 +2,7 @@
 namespace Skrz\Bundle\BunnyBundle\Command;
 
 use Skrz\Bundle\BunnyBundle\AbstractProducer;
+use Skrz\Bundle\BunnyBundle\AbstractTransactionalProducer;
 use Skrz\Bundle\BunnyBundle\Annotation\Producer;
 use Skrz\Bundle\BunnyBundle\BunnyManager;
 use Symfony\Component\Console\Command\Command;
@@ -58,7 +59,7 @@ class ProducerCommand extends Command
 		/** @var AbstractProducer $producer */
 		$producer = $this->container->get($this->producers[$producerName]->name);
 
-		if (!($producer instanceof AbstractProducer)) {
+		if (!($producer instanceof AbstractProducer || $producer instanceof AbstractTransactionalProducer)) {
 			throw new \LogicException("Producer '{$producerName}' is not instance of AbstractProducer.");
 		}
 

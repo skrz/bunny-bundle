@@ -21,6 +21,9 @@ class BunnyManager
 	/** @var Channel */
 	private $channel;
 
+	/** @var  Channel */
+	private $transactionalChannel;
+
 	/** @var array */
 	private $config;
 
@@ -58,6 +61,28 @@ class BunnyManager
 		}
 
 		return $this->channel;
+	}
+
+	/**
+	 * create/return transactional channel, where messages need to be commited
+	 *
+	 * @throws BunnyException
+	 * @return Channel|\React\Promise\PromiseInterface
+	 */
+	public function getTransactionalChannel()
+	{
+		if (!$this->transactionalChannel) {
+			$this->transactionalChannel = $this->createChannel();
+
+			// create transactional channel from normal one
+			try {
+				$this->transactionalChannel->txSelect();
+			} catch (\Exception $e) {
+				throw new BunnyException("Cannot create transaction channel.");
+			}
+		}
+
+		return $this->transactionalChannel;
 	}
 
 	public function setUp()
