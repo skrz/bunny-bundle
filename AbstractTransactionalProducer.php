@@ -79,8 +79,6 @@ class AbstractTransactionalProducer
 	}
 
 	/**
-	 * fce preda zpravu podle konkretniho routovaciho klice do rabbita
-	 *
 	 * @param object $message
 	 * @param string $routingKey
 	 * @param array $headers
@@ -142,8 +140,7 @@ class AbstractTransactionalProducer
 	}
 
 	/**
-	 * fce podle vstupu zapne/vypne automaticke commitovni requestu
-	 *
+	 * turn on/off automatic commit
 	 * @param bool $bool
 	 */
 	public function setAutoCommit($bool = true)
@@ -152,7 +149,7 @@ class AbstractTransactionalProducer
 	}
 
 	/**
-	 * fce commitne zpravy
+	 * commit messages
 	 */
 	public function commit()
 	{
@@ -164,7 +161,7 @@ class AbstractTransactionalProducer
 	}
 
 	/**
-	 * fce rollbackne zpravy
+	 * rollback messages
 	 */
 	public function rollback()
 	{
