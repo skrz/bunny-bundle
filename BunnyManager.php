@@ -21,6 +21,9 @@ class BunnyManager
 	/** @var Channel */
 	private $channel;
 
+	/** @var  Channel */
+	private $transactionalChannel;
+
 	/** @var array */
 	private $config;
 
@@ -58,6 +61,28 @@ class BunnyManager
 		}
 
 		return $this->channel;
+	}
+
+	/**
+	 * fce vytvori/vrati transakcni channel, ve kterem je potreba zpravy potvrzovat
+	 *
+	 * @throws BunnyException
+	 * @return Channel|\React\Promise\PromiseInterface
+	 */
+	public function getTransactionalChannel()
+	{
+		if (!$this->transactionalChannel) {
+			$this->transactionalChannel = $this->createChannel();
+
+			// vytvori z obyc channelu transakcni
+			try {
+				$this->transactionalChannel->txSelect();
+			} catch (\Exception $e) {
+				throw new BunnyException("Cannot create transaction channel.");
+			}
+		}
+
+		return $this->transactionalChannel;
 	}
 
 	public function setUp()
