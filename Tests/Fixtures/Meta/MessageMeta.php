@@ -660,7 +660,7 @@ class MessageMeta extends Message implements MetaInterface, PhpMetaInterface, Js
 	 *
 	 * @return string
 	 */
-	public static function toProtobuf($object, array $filter = NULL)
+	public static function toProtobuf($object, $filter = NULL)
 	{
 		$output = '';
 
