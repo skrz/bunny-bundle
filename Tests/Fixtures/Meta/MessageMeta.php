@@ -227,7 +227,7 @@ class MessageMeta extends Message implements MetaInterface, PhpMetaInterface, Js
 	 *
 	 * @return array
 	 */
-	public static function toArray($object, $group = NULL, array $filter = NULL)
+	public static function toArray($object, $group = NULL, $filter = NULL)
 	{
 		if ($object === null) {
 			return null;
@@ -361,7 +361,7 @@ class MessageMeta extends Message implements MetaInterface, PhpMetaInterface, Js
 	 *
 	 * @return object
 	 */
-	public static function toObject($object, $group = NULL, array $filter = NULL)
+	public static function toObject($object, $group = NULL, $filter = NULL)
 	{
 		if ($object === null) {
 			return null;
