@@ -29,31 +29,31 @@ class SkrzBunnyExtension extends Extension implements ConfigurationInterface
 		$rootNode->children()->scalarNode("heartbeat")->defaultValue(60);
 
 		/** @var ArrayNodeDefinition $exchangesNode */
-		$exchangesNode = $rootNode->children()->arrayNode("exchanges")->defaultValue([])->prototype("array");
+		$exchangesNode = $rootNode->children()->arrayNode("exchanges")->normalizeKeys(false)->defaultValue([])->prototype("array");
 		$exchangesNode->children()->scalarNode("type");
 		$exchangesNode->children()->booleanNode("durable")->defaultValue(false);
 		$exchangesNode->children()->booleanNode("auto_delete")->defaultValue(false);
 		$exchangesNode->children()->booleanNode("internal")->defaultValue(false);
-		$exchangesNode->children()->arrayNode("arguments")->prototype("scalar")->defaultValue([]);
+		$exchangesNode->children()->arrayNode("arguments")->normalizeKeys(false)->prototype("scalar")->defaultValue([]);
 
 		/** @var ArrayNodeDefinition $exchangesBindingsNode */
-		$exchangesBindingsNode = $exchangesNode->children()->arrayNode("bindings")->defaultValue([])->prototype("array");
+		$exchangesBindingsNode = $exchangesNode->children()->arrayNode("bindings")->normalizeKeys(false)->defaultValue([])->prototype("array");
 		$exchangesBindingsNode->children()->scalarNode("exchange")->isRequired();
 		$exchangesBindingsNode->children()->scalarNode("routing_key")->defaultValue("");
-		$exchangesBindingsNode->children()->arrayNode("arguments")->prototype("scalar")->defaultValue([]);
+		$exchangesBindingsNode->children()->arrayNode("arguments")->normalizeKeys(false)->prototype("scalar")->defaultValue([]);
 
 		/** @var ArrayNodeDefinition $queuesNode */
-		$queuesNode = $rootNode->children()->arrayNode("queues")->defaultValue([])->prototype("array");
+		$queuesNode = $rootNode->children()->arrayNode("queues")->normalizeKeys(false)->defaultValue([])->prototype("array");
 		$queuesNode->children()->booleanNode("durable")->defaultValue(false);
 		$queuesNode->children()->booleanNode("exclusive")->defaultValue(false);
 		$queuesNode->children()->booleanNode("auto_delete")->defaultValue(false);
-		$queuesNode->children()->arrayNode("arguments")->prototype("scalar")->defaultValue([]);
+		$queuesNode->children()->arrayNode("arguments")->normalizeKeys(false)->prototype("scalar")->defaultValue([]);
 
 		/** @var ArrayNodeDefinition $queuesBindingsNode */
-		$queuesBindingsNode = $queuesNode->children()->arrayNode("bindings")->defaultValue([])->prototype("array");
+		$queuesBindingsNode = $queuesNode->children()->arrayNode("bindings")->normalizeKeys(false)->defaultValue([])->prototype("array");
 		$queuesBindingsNode->children()->scalarNode("exchange")->isRequired();
 		$queuesBindingsNode->children()->scalarNode("routing_key")->defaultValue("");
-		$queuesBindingsNode->children()->arrayNode("arguments")->prototype("scalar")->defaultValue([]);
+		$queuesBindingsNode->children()->arrayNode("arguments")->normalizeKeys(false)->prototype("scalar")->defaultValue([]);
 
 		return $treeBuilder;
 	}
