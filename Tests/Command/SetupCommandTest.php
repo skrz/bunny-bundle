@@ -1,6 +1,7 @@
 <?php
 namespace Skrz\Bundle\BunnyBundle\Tests\Command;
 
+use Bunny\Channel;
 use Bunny\Client;
 use Bunny\Exception\ClientException;
 use Skrz\Bundle\BunnyBundle\SkrzBunnyBundle;
@@ -34,11 +35,14 @@ class SetupCommandTest extends \PHPUnit_Framework_TestCase
 		$client = new Client();
 		$client->connect();
 
+		$channel = null;
+
 		try {
 			$channel = $client->channel();
 			$channel->exchangeDeclare("test_direct_exchange", "direct", true);
 			$this->fail("Exchange should not exist.");
 		} catch (ClientException $e) {
+			$client->removeChannel($channel->getChannelId());
 		}
 
 		try {
@@ -46,6 +50,7 @@ class SetupCommandTest extends \PHPUnit_Framework_TestCase
 			$channel->exchangeDeclare("test_topic_exchange", "direct", true);
 			$this->fail("Exchange should not exist.");
 		} catch (ClientException $e) {
+			$client->removeChannel($channel->getChannelId());
 		}
 
 		$this->runWithConfig(__DIR__ . "/../Fixtures/exchange.yml");
@@ -67,16 +72,19 @@ class SetupCommandTest extends \PHPUnit_Framework_TestCase
 		}
 	}
 
-	public function testqueue()
+	public function testQueue()
 	{
 		$client = new Client();
 		$client->connect();
+
+		$channel = null;
 
 		try {
 			$channel = $client->channel();
 			$channel->queueDeclare("test_queue", true, true);
 			$this->fail("queue should not exist.");
 		} catch (ClientException $e) {
+			$client->removeChannel($channel->getChannelId());
 		}
 
 		$this->runWithConfig(__DIR__ . "/../Fixtures/queue.yml");
