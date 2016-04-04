@@ -80,6 +80,11 @@ class BunnyCompilerPass implements CompilerPassInterface
 			}
 
 			$className = $parameterBag->resolveValue($definition->getClass());
+
+			if (!class_exists($className)) {
+				continue;
+			}
+
 			$rc = new \ReflectionClass($className);
 
 			if (strpos($rc->getDocComment(), "@Consumer") === false && strpos($rc->getDocComment(), "@Producer") === false) {
