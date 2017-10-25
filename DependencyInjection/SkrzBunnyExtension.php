@@ -29,7 +29,7 @@ class SkrzBunnyExtension extends Extension implements ConfigurationInterface
 		$rootNode->children()->scalarNode("heartbeat")->defaultValue(60);
 
 		/** @var ArrayNodeDefinition $exchangesNode */
-		$exchangesNode = $rootNode->children()->arrayNode("exchanges")->normalizeKeys(false)->defaultValue([])->prototype("array");
+		$exchangesNode = $rootNode->children()->arrayNode("exchanges")->useAttributeAsKey("name")->normalizeKeys(false)->defaultValue([])->prototype("array");
 		$exchangesNode->children()->scalarNode("type");
 		$exchangesNode->children()->booleanNode("durable")->defaultValue(false);
 		$exchangesNode->children()->booleanNode("auto_delete")->defaultValue(false);
@@ -43,7 +43,7 @@ class SkrzBunnyExtension extends Extension implements ConfigurationInterface
 		$exchangesBindingsNode->children()->arrayNode("arguments")->normalizeKeys(false)->prototype("scalar")->defaultValue([]);
 
 		/** @var ArrayNodeDefinition $queuesNode */
-		$queuesNode = $rootNode->children()->arrayNode("queues")->normalizeKeys(false)->defaultValue([])->prototype("array");
+		$queuesNode = $rootNode->children()->arrayNode("queues")->useAttributeAsKey("name")->normalizeKeys(false)->defaultValue([])->prototype("array");
 		$queuesNode->children()->booleanNode("durable")->defaultValue(false);
 		$queuesNode->children()->booleanNode("exclusive")->defaultValue(false);
 		$queuesNode->children()->booleanNode("auto_delete")->defaultValue(false);
