@@ -27,7 +27,7 @@
     "require": {
         "php": ">=5.5.9",
         "bunny/bunny": "~0.2.2",
-        "skrz/autowiring-bundle": "~1.1",
+        "skrz/autowiring-bundle": "~1.1|~2.0",
         "skrz/meta": ">=3.0, <4.0"
     },
     "require-dev": {
