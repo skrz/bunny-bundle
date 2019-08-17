@@ -159,40 +159,51 @@ class BunnyCompilerPass implements CompilerPassInterface
 			}
 		}
 
-		$container->setDefinition($this->clientServiceId, new Definition("Bunny\\Client", [[
+		$client = new Definition("Bunny\\Client", [[
 			"host" => $config["host"],
 			"port" => $config["port"],
 			"vhost" => $config["vhost"],
 			"user" => $config["user"],
 			"password" => $config["password"],
 			"heartbeat" => $config["heartbeat"],
-		]]));
+		]]);
+		$client->setPublic(true);
+		$container->setDefinition($this->clientServiceId, $client);
 
-		$container->setDefinition($this->managerServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\BunnyManager", [
+		$bunnyManager = new Definition("Skrz\\Bundle\\BunnyBundle\\BunnyManager", [
 			new Reference("service_container"),
 			$this->clientServiceId,
 			$config,
-		]));
+		]);
+		$bunnyManager->setPublic(true);
+		$container->setDefinition($this->managerServiceId, $bunnyManager);
 
 		$channel = new Definition("Bunny\\Channel");
 		$channel->setFactory([new Reference($this->managerServiceId), "getChannel"]);
+		$channel->setPublic(true);
 		$container->setDefinition($this->channelServiceId, $channel);
 
-		$container->setDefinition($this->setupCommandServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\SetupCommand", [
+		$setupCommand = new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\SetupCommand", [
 			new Reference($this->managerServiceId),
-		]));
+		]);
+		$setupCommand->setPublic(true);
+		$container->setDefinition($this->setupCommandServiceId, );
 
-		$container->setDefinition($this->consumerCommandServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\ConsumerCommand", [
+		$consumerCommand = new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\ConsumerCommand", [
 			new Reference("service_container"),
 			new Reference($this->managerServiceId),
 			$consumers,
-		]));
+		]);
+		$consumerCommand->setPublic(true);
+		$container->setDefinition($this->consumerCommandServiceId, $consumerCommand);
 
-		$container->setDefinition($this->producerCommandServiceId, new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\ProducerCommand", [
+		$producerCommand = new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\ProducerCommand", [
 			new Reference("service_container"),
 			new Reference($this->managerServiceId),
 			$producers,
-		]));
+		]);
+		$producerCommand->setPublic(true);
+		$container->setDefinition($this->producerCommandServiceId, $producerCommand);
 	}
 
 }
