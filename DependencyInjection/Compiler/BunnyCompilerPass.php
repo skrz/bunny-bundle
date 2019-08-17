@@ -187,7 +187,7 @@ class BunnyCompilerPass implements CompilerPassInterface
 			new Reference($this->managerServiceId),
 		]);
 		$setupCommand->setPublic(true);
-		$container->setDefinition($this->setupCommandServiceId, );
+		$container->setDefinition($this->setupCommandServiceId, $setupCommand);
 
 		$consumerCommand = new Definition("Skrz\\Bundle\\BunnyBundle\\Command\\ConsumerCommand", [
 			new Reference("service_container"),
