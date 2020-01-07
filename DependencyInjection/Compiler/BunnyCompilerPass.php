@@ -98,8 +98,6 @@ class BunnyCompilerPass implements CompilerPassInterface
 							"Either 'queue', or 'exchange' (but not both) has to be specified {$className} (service: {$serviceId})."
 						);
 					}
-
-					$annotation->name = $serviceId;
 					$annotation->className = $className;
 
 					$consumerName = $rc->getShortName();
@@ -122,7 +120,6 @@ class BunnyCompilerPass implements CompilerPassInterface
 					$consumers[$consumerName][] = (array)$annotation;
 
 				} elseif ($annotation instanceof Producer) {
-					$annotation->name = $serviceId;
 					$annotation->className = $className;
 
 					$producerName = $rc->getShortName();
