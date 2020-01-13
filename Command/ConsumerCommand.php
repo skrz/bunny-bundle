@@ -71,7 +71,7 @@ class ConsumerCommand extends Command
 		$this->manager->setUp();
 
 		$channel = $this->manager->getChannel();
-		$consumer = $this->container->get($this->consumers[$consumerName][0]->name);
+		$consumer = $this->container->get($this->consumers[$consumerName][0]->className);
 		$maxMessages = PHP_INT_MAX;
 		$maxSeconds = PHP_INT_MAX;
 		$calledSetUps = [];

@@ -57,7 +57,7 @@ class ProducerCommand extends Command
 		}
 
 		/** @var AbstractProducer $producer */
-		$producer = $this->container->get($this->producers[$producerName]->name);
+		$producer = $this->container->get($this->producers[$producerName]->className);
 
 		if (!($producer instanceof AbstractProducer || $producer instanceof AbstractTransactionalProducer)) {
 			throw new \LogicException("Producer '{$producerName}' is not instance of AbstractProducer.");
