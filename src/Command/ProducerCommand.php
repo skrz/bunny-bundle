@@ -1,43 +1,48 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Skrz\Bundle\BunnyBundle\Command;
 
-use Skrz\Bundle\BunnyBundle\AbstractProducer;
-use Skrz\Bundle\BunnyBundle\AbstractTransactionalProducer;
-use Skrz\Bundle\BunnyBundle\Annotation\Producer;
-use Skrz\Bundle\BunnyBundle\BunnyManager;
+use InvalidArgumentException;
+use Skrz\Bundle\BunnyBundle\Exception\BunnyException;
+use Skrz\Bundle\BunnyBundle\Queue\BunnyProducerInterface;
+use Skrz\Bundle\BunnyBundle\Service\BunnyManager;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ProducerCommand extends Command
 {
 
-	/** @var ContainerInterface */
-	private $container;
+	/**
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
+	 * @var string|null The default command name
+	 */
+	protected static $defaultName = 'bunny:producer';
+	private BunnyManager $manager;
+	/** @var BunnyProducerInterface[] */
+	private iterable $producers;
 
-	/** @var BunnyManager */
-	private $manager;
-
-	/** @var Producer[] */
-	private $producers;
-
-	public function __construct(ContainerInterface $container, BunnyManager $manager, array $producers)
+	/** @param BunnyProducerInterface[] $producers */
+	public function __construct(BunnyManager $manager, iterable $producers)
 	{
-		parent::__construct("bunny:producer");
-		$this->container = $container;
 		$this->manager = $manager;
 		$this->producers = [];
-		foreach ($producers as $producerName => $producer) {
-			$this->producers[$producerName] = Producer::fromArray($producer);
+
+		foreach ($producers as $producer) {
+			$this->producers[$producer->getName()] = $producer;
 		}
+
+		parent::__construct();
 	}
 
-	protected function configure()
+	protected function configure(): void
 	{
 		$this
+			->setHelp("Available producers are:\n" . implode(PHP_EOL, array_keys($this->producers)))
 			->setDescription("Send message through producer.")
 			->addArgument("producer-name", InputArgument::REQUIRED, "Name of the producer.")
 			->addArgument("message", InputArgument::REQUIRED, "Message JSON string.")
@@ -46,27 +51,22 @@ class ProducerCommand extends Command
 			->addOption("listFile", "f", InputOption::VALUE_OPTIONAL, "line separated list of ids to produce");
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output)
+	protected function execute(InputInterface $input, OutputInterface $output): void
 	{
-		$producerName = strtolower($input->getArgument("producer-name"));
+		$producerName = $input->getArgument("producer-name");
 		$message = $input->getArgument("message");
 		$routingKey = $input->getArgument("routing-key");
 
 		if (!isset($this->producers[$producerName])) {
-			throw new \InvalidArgumentException("Producer '{$producerName}' does not exist.");
+			throw new InvalidArgumentException("Producer '{$producerName}' does not exist.");
 		}
 
-		/** @var AbstractProducer $producer */
-		$producer = $this->container->get($this->producers[$producerName]->className);
-
-		if (!($producer instanceof AbstractProducer || $producer instanceof AbstractTransactionalProducer)) {
-			throw new \LogicException("Producer '{$producerName}' is not instance of AbstractProducer.");
-		}
-
+		$producer = $this->producers[$producerName];
 		$this->manager->setUp();
 
 		if ($input->getOption("listFile")) {
-			$handle = fopen($input->getOption("listFile"), "r");
+			$handle = fopen($input->getOption("listFile"), 'rb');
+
 			if ($handle) {
 				while (($line = fgets($handle)) !== false) {
 					$producer->publish(sprintf($message, trim($line)), $routingKey);
@@ -74,7 +74,7 @@ class ProducerCommand extends Command
 
 				fclose($handle);
 			} else {
-				throw new \Exception("error reading file");
+				throw new BunnyException("error reading file");
 			}
 		} else {
 			for ($i = 0, $count = $input->getOption("count"); $i < $count; ++$i) {
@@ -82,5 +82,4 @@ class ProducerCommand extends Command
 			}
 		}
 	}
-
 }

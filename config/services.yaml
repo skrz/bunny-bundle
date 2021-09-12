@@ -1,0 +1,31 @@
+services:
+  _defaults:
+    autowire: true
+    autoconfigure: true
+    public: false
+
+  Skrz\Bundle\BunnyBundle\:
+    resource: "../src/*"
+    exclude: "../src/{DependencyInjection,BunnyBundle.php}"
+
+  Skrz\Bundle\BunnyBundle\Service\BunnyManager:
+    arguments:
+      $config: "%skrz_bunny%"
+
+  Bunny\Client:
+    arguments:
+      $options: "%skrz_bunny%"
+    public: true # this is because of autowirebundle
+
+  Bunny\Channel:
+    factory: ['@Skrz\Bundle\BunnyBundle\Service\BunnyManager','getChannel']
+    public: true # this is because of autowirebundle
+    lazy: true
+
+  Skrz\Bundle\BunnyBundle\Command\ConsumerCommand:
+    arguments:
+      $consumers: !tagged skrz.bunny.consumer
+
+  Skrz\Bundle\BunnyBundle\Command\ProducerCommand:
+    arguments:
+      $producers: !tagged skrz.bunny.producer
