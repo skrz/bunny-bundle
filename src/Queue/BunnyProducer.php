@@ -13,7 +13,6 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 /**
  * @author Lukas Senfeld <skrz@senfeld.net>
- * @method preProcessMessage(mixed $message, Channel $channel): void
  */
 abstract class BunnyProducer implements BunnyProducerInterface
 {
@@ -30,12 +29,10 @@ abstract class BunnyProducer implements BunnyProducerInterface
 	private string $name;
 	private string $routingKey = "";
 	private bool $transactional = false;
-	private bool $hasBeforeMethod;
 
 	public function __construct(?string $name = null)
 	{
 		$this->name = $name ?? $this->generateName();
-		$this->hasBeforeMethod = method_exists($this, 'preProcessMessage');
 		$this->configure();
 	}
 
@@ -44,7 +41,6 @@ abstract class BunnyProducer implements BunnyProducerInterface
 		$this->manager = $manager;
 		$this->serializer = $serializer;
 	}
-
 
 	/**
 	 * @param string|object $message
@@ -56,7 +52,7 @@ abstract class BunnyProducer implements BunnyProducerInterface
 			$message = $this->serializer->deserialize($message, $this->messageClassName, 'json');
 		}
 
-		if ($this->hasBeforeMethod) {
+		if ($this instanceof BunnyPreProcessorInterface) {
 			$this->preProcessMessage($message, $this->manager->getChannel());
 		}
 
@@ -99,10 +95,7 @@ abstract class BunnyProducer implements BunnyProducerInterface
 		}
 	}
 
-	public function configure(): void
-	{
-		// used to configure producer
-	}
+	abstract public function configure(): void;
 
 	private function generateName(): string
 	{

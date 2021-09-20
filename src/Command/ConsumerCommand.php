@@ -137,7 +137,7 @@ class ConsumerCommand extends Command
 		while (microtime(true) < $startTime + $maxSeconds && $this->messages < $maxMessages) {
 			$channel->getClient()->run($consumer->getTickSeconds() ?: $maxSeconds);
 
-			if ($consumer instanceof BunnyTickingConsumer) {
+			if ($consumer instanceof BunnyTickingConsumerInterface) {
 				$consumer->tick($channel);
 			}
 		}
@@ -155,7 +155,7 @@ class ConsumerCommand extends Command
 
 				break;
 			case ContentTypes::APPLICATION_PROTOBUF:
-				$object = $this->serializer->deserialize($data, $consumer->getMessageClassName(), ':protobuf');
+				$object = $this->serializer->deserialize($data, $consumer->getMessageClassName(), 'protobuf');
 
 				break;
 			default:

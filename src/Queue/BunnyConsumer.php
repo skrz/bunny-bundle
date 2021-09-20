@@ -23,7 +23,6 @@ abstract class BunnyConsumer implements BunnyConsumerInterface
 	protected bool $nowait = false;
 	protected ?int $prefetchCount = null;
 	protected ?int $prefetchSize = null;
-	protected ?float $tickSeconds = null;
 	protected ?int $maxMessages = null;
 	protected ?float $maxSeconds = null;
 	protected array $arguments = [];
@@ -177,18 +176,6 @@ abstract class BunnyConsumer implements BunnyConsumerInterface
 	public function setPrefetchSize(?int $prefetchSize): BunnyConsumer
 	{
 		$this->prefetchSize = $prefetchSize;
-
-		return $this;
-	}
-
-	public function getTickSeconds(): ?float
-	{
-		return $this->tickSeconds;
-	}
-
-	public function setTickSeconds(?float $tickSeconds): BunnyConsumer
-	{
-		$this->tickSeconds = $tickSeconds;
 
 		return $this;
 	}

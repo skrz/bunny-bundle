@@ -62,7 +62,7 @@ class BunnyManager
 			try {
 				$this->transactionalChannel->txSelect();
 			} catch (Exception $e) {
-				throw new BunnyException("Cannot create transaction channel.");
+				throw new BunnyException(sprintf("Cannot create transaction channel because: %s", $e->getMessage()));
 			}
 		}
 

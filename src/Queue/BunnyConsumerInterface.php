@@ -38,8 +38,6 @@ interface BunnyConsumerInterface
 	public function setPrefetchCount(?int $prefetchCount): BunnyConsumerInterface;
 	public function getPrefetchSize(): ?int;
 	public function setPrefetchSize(?int $prefetchSize): BunnyConsumerInterface;
-	public function getTickSeconds(): ?float;
-	public function setTickSeconds(?float $tickSeconds): BunnyConsumerInterface;
 	public function getMaxMessages(): ?int;
 	public function setMaxMessages(?int $maxMessages): BunnyConsumerInterface;
 	public function getMaxSeconds(): ?float;

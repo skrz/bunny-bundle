@@ -31,7 +31,7 @@
     ],
     "require": {
         "php": ">=7.4",
-        "bunny/bunny": "~0.1",
+        "bunny/bunny": "~0.5",
         "symfony/console": "~3.4 | ~4.4",
         "symfony/framework-bundle": "~3.4 | ~4.4",
         "symfony/serializer": "~3.4 | ~4.4"

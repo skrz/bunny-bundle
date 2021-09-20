@@ -28,7 +28,7 @@ interface BunnyProducerInterface
 	public function setContentType(string $contentType): BunnyProducerInterface;
 
 	/**
-	 * @param object $message
+	 * @param string|object $message
 	 * @param array<string, string> $headers
 	 */
 	public function publish($message, ?string $routingKey = null, array $headers = []): void;
