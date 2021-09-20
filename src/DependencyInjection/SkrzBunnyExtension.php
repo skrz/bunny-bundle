@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Skrz\Bundle\BunnyBundle\DependencyInjection;
 
-use Skrz\Bundle\BunnyBundle\DependencyInjection\Configuration\Configuration;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyConsumerInterface;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyProducerInterface;
 use Symfony\Component\Config\FileLocator;
