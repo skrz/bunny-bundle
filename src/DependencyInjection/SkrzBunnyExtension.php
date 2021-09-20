@@ -34,9 +34,11 @@ class SkrzBunnyExtension extends Extension implements ConfigurationInterface
 			$rootNode = $treeBuilder->getRootNode();
 		}
 
+		assert($rootNode instanceof ArrayNodeDefinition);
+
 		$rootNode->children()->scalarNode('host')->defaultValue('127.0.0.1');
 		$rootNode->children()->scalarNode('port')->defaultValue(5672);
-		$rootNode->children()->scalarNode('vhost')->defaultValue(''/'');
+		$rootNode->children()->scalarNode('vhost')->defaultValue('/');
 		$rootNode->children()->scalarNode('user')->defaultValue('guest');
 		$rootNode->children()->scalarNode('password')->defaultValue('guest');
 		$rootNode->children()->scalarNode('heartbeat')->defaultValue(60);

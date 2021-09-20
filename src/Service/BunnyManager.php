@@ -16,23 +16,29 @@ use Skrz\Bundle\BunnyBundle\Exception\BunnyException;
 class BunnyManager
 {
 
-	private Client $client;
 	private ?Channel $channel;
-	private ?Channel $transactionalChannel;
-	/** @var array */
+
+	private Client $client;
+
+	/**
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
+	 * @var array
+	 */
 	private array $config;
+
 	private bool $setUpComplete = false;
 
+	private ?Channel $transactionalChannel;
+
+	/**
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification
+	 * @param array $config
+	 */
 	public function __construct(Client $client, array $config)
 	{
 		$this->config = $config;
 		$this->client = $client;
 		$this->channel = null;
-	}
-
-	public function getClient(): Client
-	{
-		return $this->client;
 	}
 
 	public function createChannel(): Channel
@@ -41,7 +47,13 @@ class BunnyManager
 			$this->getClient()->connect();
 		}
 
-		return $this->getClient()->channel();
+		$channel = $this->getClient()->channel();
+		assert(
+			$channel instanceof Channel,
+			new BunnyException(sprintf("bunny/bunny did not return channel but %s instead", get_class($channel)))
+		);
+
+		return $channel;
 	}
 
 	public function getChannel(): Channel
@@ -53,9 +65,14 @@ class BunnyManager
 		return $this->channel;
 	}
 
+	public function getClient(): Client
+	{
+		return $this->client;
+	}
+
 	public function getTransactionalChannel(): Channel
 	{
-		if (!$this->transactionalChannel) {
+		if ($this->transactionalChannel === null) {
 			$this->transactionalChannel = $this->createChannel();
 
 			// create transactional channel from normal one

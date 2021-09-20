@@ -13,7 +13,6 @@ use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use InvalidArgumentException;
 use Skrz\Bundle\BunnyBundle\Exception\BunnyException;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyConsumerInterface;
-use Skrz\Bundle\BunnyBundle\Queue\BunnyTickingConsumer;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyTickingConsumerInterface;
 use Skrz\Bundle\BunnyBundle\Service\BunnyManager;
 use Skrz\Bundle\BunnyBundle\Service\ContentTypes;
@@ -27,15 +26,19 @@ use Symfony\Component\Serializer\SerializerInterface;
 class ConsumerCommand extends Command
 {
 
-	/** @var BunnyConsumerInterface[] */
-	private iterable $consumers;
+	/** @var array<string, BunnyConsumerInterface> */
+	private array $consumers;
+
 	/**
 	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint
 	 * @var string|null The default command name
 	 */
 	protected static $defaultName = 'bunny:consumer';
+
 	private BunnyManager $manager;
+
 	private int $messages = 0;
+
 	private SerializerInterface $serializer;
 
 	/** @param BunnyConsumerInterface[] $consumers */
@@ -63,7 +66,7 @@ class ConsumerCommand extends Command
 			->addArgument("consumer-parameters", InputArgument::IS_ARRAY, "Argv input to consumer.", []);
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output): void
+	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$consumerName = $input->getArgument("consumer-name");
 
@@ -77,11 +80,6 @@ class ConsumerCommand extends Command
 		$this->manager->setUp();
 
 		$channel = $this->manager->getChannel();
-
-		if ($channel === null) {
-			throw new BunnyException("Could not open channel.");
-		}
-
 		$consumer = $this->consumers[$consumerName];
 
 		if ($consumer->getQueue() === null) {
@@ -93,15 +91,15 @@ class ConsumerCommand extends Command
 
 			$consumer->setQueue($queueOk->queue);
 
-			$bindOk = $channel->queueBind($consumer->getQueue(), $consumer->getExchange(), $consumer->getRoutingKey());
+			$bindOk = $channel->queueBind($queueOk->queue, $consumer->getExchange(), $consumer->getRoutingKey());
 
 			if (!($bindOk instanceof MethodQueueBindOkFrame)) {
 				throw new BunnyException("Could not bind anonymous queue.");
 			}
 		}
 
-		if ($consumer->getPrefetchSize() || $consumer->getPrefetchCount()) {
-			$qosOk = $channel->qos($consumer->getPrefetchSize(), $consumer->getPrefetchCount());
+		if ($consumer->getPrefetchSize() !== null || $consumer->getPrefetchCount() !== null) {
+			$qosOk = $channel->qos($consumer->getPrefetchSize() ?? 0, $consumer->getPrefetchCount() ?? 0);
 
 			if (!($qosOk instanceof MethodBasicQosOkFrame)) {
 				throw new BunnyException("Could not set prefetch-size/prefetch-count.");
@@ -116,6 +114,8 @@ class ConsumerCommand extends Command
 				)
 			);
 		}
+
+		assert($consumer->getQueue() !== null, new BunnyException("Cannot bind onto null queue"));
 
 		$channel->consume(
 			function (Message $message, Channel $channel, Client $client) use ($consumer): void {
@@ -135,7 +135,13 @@ class ConsumerCommand extends Command
 		$maxSeconds = $consumer->getMaxSeconds() ?: PHP_INT_MAX;
 
 		while (microtime(true) < $startTime + $maxSeconds && $this->messages < $maxMessages) {
-			$channel->getClient()->run($consumer->getTickSeconds() ?: $maxSeconds);
+			$seconds = $maxSeconds;
+
+			if ($consumer instanceof BunnyTickingConsumerInterface) {
+				$seconds = $consumer->getTickSeconds() ?: $maxSeconds;
+			}
+
+			$channel->getClient()->run($seconds);
 
 			if ($consumer instanceof BunnyTickingConsumerInterface) {
 				$consumer->tick($channel);
@@ -143,6 +149,8 @@ class ConsumerCommand extends Command
 		}
 
 		$channel->getClient()->disconnect();
+
+		return 0;
 	}
 
 	public function handleMessage(BunnyConsumerInterface $consumer, Message $message, Channel $channel, Client $client): void

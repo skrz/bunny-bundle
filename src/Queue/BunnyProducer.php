@@ -4,30 +4,38 @@ declare(strict_types=1);
 
 namespace Skrz\Bundle\BunnyBundle\Queue;
 
-use Bunny\Channel;
 use ReflectionClass;
 use Skrz\Bundle\BunnyBundle\Exception\BunnyException;
 use Skrz\Bundle\BunnyBundle\Service\BunnyManager;
 use Skrz\Bundle\BunnyBundle\Service\ContentTypes;
 use Symfony\Component\Serializer\SerializerInterface;
 
-/**
- * @author Lukas Senfeld <skrz@senfeld.net>
- */
+/** @author Lukas Senfeld <skrz@senfeld.net> */
 abstract class BunnyProducer implements BunnyProducerInterface
 {
 
 	private const NAME_SUFFIX_TO_REMOVE = "Producer";
+
 	private BunnyManager $manager;
+
 	private SerializerInterface $serializer;
+
 	private bool $autoCommit = false;
+
 	private string $exchange = "";
+
 	private bool $immediate = false;
+
 	private bool $mandatory = false;
+
 	private string $contentType = ContentTypes::APPLICATION_JSON;
+
 	private string $messageClassName;
+
 	private string $name;
+
 	private string $routingKey = "";
+
 	private bool $transactional = false;
 
 	public function __construct(?string $name = null)
@@ -77,10 +85,6 @@ abstract class BunnyProducer implements BunnyProducerInterface
 			$channel = $this->manager->getChannel();
 		}
 
-		if (!$channel instanceof Channel) {
-			throw new BunnyException("Could not open channel.");
-		}
-
 		$channel->publish(
 			$message,
 			$headers,
@@ -102,7 +106,9 @@ abstract class BunnyProducer implements BunnyProducerInterface
 		$reflection = new ReflectionClass($this);
 		$name = $reflection->getShortName();
 
-		return preg_replace('/' . self::NAME_SUFFIX_TO_REMOVE . '$/', '', $name);
+		$updatedName = preg_replace('/' . self::NAME_SUFFIX_TO_REMOVE . '$/', '', $name);
+
+		return (string)$updatedName;
 	}
 
 	public function getExchange(): string

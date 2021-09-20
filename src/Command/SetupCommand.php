@@ -17,6 +17,7 @@ class SetupCommand extends Command
 	 * @var string|null The default command name
 	 */
 	protected static $defaultName = 'bunny:setup';
+
 	private BunnyManager $manager;
 
 	public function __construct(BunnyManager $manager)
@@ -30,8 +31,10 @@ class SetupCommand extends Command
 		$this->setDescription("Sets up exchange-queue topology as specified on bunny configuration.");
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output): void
+	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$this->manager->setUp();
+
+		return 0;
 	}
 }

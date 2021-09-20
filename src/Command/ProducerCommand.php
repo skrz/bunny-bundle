@@ -22,9 +22,11 @@ class ProducerCommand extends Command
 	 * @var string|null The default command name
 	 */
 	protected static $defaultName = 'bunny:producer';
+
 	private BunnyManager $manager;
-	/** @var BunnyProducerInterface[] */
-	private iterable $producers;
+
+	/** @var array<string, BunnyProducerInterface> */
+	private array $producers;
 
 	/** @param BunnyProducerInterface[] $producers */
 	public function __construct(BunnyManager $manager, iterable $producers)
@@ -51,7 +53,7 @@ class ProducerCommand extends Command
 			->addOption("listFile", "f", InputOption::VALUE_OPTIONAL, "line separated list of ids to produce");
 	}
 
-	protected function execute(InputInterface $input, OutputInterface $output): void
+	protected function execute(InputInterface $input, OutputInterface $output): int
 	{
 		$producerName = $input->getArgument("producer-name");
 		$message = $input->getArgument("message");
@@ -64,10 +66,10 @@ class ProducerCommand extends Command
 		$producer = $this->producers[$producerName];
 		$this->manager->setUp();
 
-		if ($input->getOption("listFile")) {
+		if ($input->getOption("listFile") !== null) {
 			$handle = fopen($input->getOption("listFile"), 'rb');
 
-			if ($handle) {
+			if ($handle !== false) {
 				while (($line = fgets($handle)) !== false) {
 					$producer->publish(sprintf($message, trim($line)), $routingKey);
 				}
@@ -81,5 +83,7 @@ class ProducerCommand extends Command
 				$producer->publish($message, $routingKey);
 			}
 		}
+
+		return 0;
 	}
 }

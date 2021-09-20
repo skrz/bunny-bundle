@@ -16,8 +16,8 @@ interface BunnyConsumerInterface
 {
 	public function configure(): void;
 	public function getName(): string;
-	public function getExchange(): ?string;
-	public function setExchange(?string $exchange): BunnyConsumerInterface;
+	public function getExchange(): string;
+	public function setExchange(string $exchange): BunnyConsumerInterface;
 	public function getRoutingKey(): string;
 	public function setRoutingKey(string $routingKey): BunnyConsumerInterface;
 	public function getQueue(): ?string;
@@ -32,7 +32,11 @@ interface BunnyConsumerInterface
 	public function setExclusive(bool $exclusive): BunnyConsumerInterface;
 	public function isNowait(): bool;
 	public function setNowait(bool $nowait): BunnyConsumerInterface;
+
+	/** @return string[] */
 	public function getArguments(): array;
+
+	/** @param string[] $arguments */
 	public function setArguments(array $arguments): BunnyConsumerInterface;
 	public function getPrefetchCount(): ?int;
 	public function setPrefetchCount(?int $prefetchCount): BunnyConsumerInterface;

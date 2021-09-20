@@ -11,20 +11,36 @@ abstract class BunnyConsumer implements BunnyConsumerInterface
 {
 
 	private const NAME_SUFFIX_TO_REMOVE = "Consumer";
+
 	private string $name;
+
 	private string $messageClassName;
-	protected ?string $exchange = null;
+
+	protected string $exchange = "";
+
 	protected string $routingKey = "";
+
 	protected ?string $queue = null;
+
 	protected string $consumerTag = "";
+
 	protected bool $noLocal = false;
+
 	protected bool $noAck = false;
+
 	protected bool $exclusive = false;
+
 	protected bool $nowait = false;
+
 	protected ?int $prefetchCount = null;
+
 	protected ?int $prefetchSize = null;
+
 	protected ?int $maxMessages = null;
+
 	protected ?float $maxSeconds = null;
+
+	/** @var string[] */
 	protected array $arguments = [];
 
 	public function __construct(?string $name = null)
@@ -38,7 +54,9 @@ abstract class BunnyConsumer implements BunnyConsumerInterface
 		$reflection = new ReflectionClass($this);
 		$name = $reflection->getShortName();
 
-		return preg_replace('/' . self::NAME_SUFFIX_TO_REMOVE . '$/', '', $name);
+		$updatedName = preg_replace('/' . self::NAME_SUFFIX_TO_REMOVE . '$/', '', $name);
+
+		return (string) $updatedName;
 	}
 
 	abstract public function configure(): void;
@@ -48,12 +66,12 @@ abstract class BunnyConsumer implements BunnyConsumerInterface
 		return $this->name;
 	}
 
-	public function getExchange(): ?string
+	public function getExchange(): string
 	{
 		return $this->exchange;
 	}
 
-	public function setExchange(?string $exchange): BunnyConsumer
+	public function setExchange(string $exchange): BunnyConsumer
 	{
 		$this->exchange = $exchange;
 
@@ -108,11 +126,16 @@ abstract class BunnyConsumer implements BunnyConsumerInterface
 		return $this;
 	}
 
+	/** @return string[] */
 	public function getArguments(): array
 	{
 		return $this->arguments;
 	}
 
+	/**
+	 * @param string[] $arguments
+	 * @return $this
+	 */
 	public function setArguments(array $arguments): BunnyConsumer
 	{
 		$this->arguments = $arguments;
