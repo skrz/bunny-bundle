@@ -13,6 +13,7 @@ use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use InvalidArgumentException;
 use Skrz\Bundle\BunnyBundle\Exception\BunnyException;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyConsumerInterface;
+use Skrz\Bundle\BunnyBundle\Queue\BunnyInitializableInterface;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyTickingConsumerInterface;
 use Skrz\Bundle\BunnyBundle\Service\BunnyManager;
 use Skrz\Bundle\BunnyBundle\Service\ContentTypes;
@@ -116,6 +117,10 @@ class ConsumerCommand extends Command
 		}
 
 		assert($consumer->getQueue() !== null, new BunnyException("Cannot bind onto null queue"));
+
+		if ($consumer instanceof BunnyInitializableInterface) {
+			$consumer->initialize($channel, $consumerArgv);
+		}
 
 		$channel->consume(
 			function (Message $message, Channel $channel, Client $client) use ($consumer): void {
