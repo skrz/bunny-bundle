@@ -119,7 +119,7 @@ class ConsumerCommand extends Command
 		assert($consumer->getQueue() !== null, new BunnyException("Cannot bind onto null queue"));
 
 		if ($consumer instanceof BunnyInitializableInterface) {
-			$consumer->initialize($channel, $consumerArgv);
+			$consumer->initialize($channel, ...$consumerArgv);
 		}
 
 		$channel->consume(
