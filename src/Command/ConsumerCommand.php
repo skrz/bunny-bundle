@@ -11,6 +11,7 @@ use Bunny\Protocol\MethodBasicQosOkFrame;
 use Bunny\Protocol\MethodQueueBindOkFrame;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Skrz\Bundle\BunnyBundle\Exception\BunnyException;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyConsumerInterface;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyDeserializationErrorHandlerInterface;
@@ -44,9 +45,15 @@ class ConsumerCommand extends Command
 
 	private SerializerInterface $serializer;
 
+	private LoggerInterface $log;
+
 	/** @param BunnyConsumerInterface[] $consumers */
-	public function __construct(BunnyManager $manager, SerializerInterface $serializer, iterable $consumers)
-	{
+	public function __construct(
+		BunnyManager $manager,
+		SerializerInterface $serializer,
+		LoggerInterface $log,
+		iterable $consumers
+	) {
 		$this->manager = $manager;
 
 		$this->consumers = [];
@@ -57,6 +64,7 @@ class ConsumerCommand extends Command
 		}
 
 		$this->serializer = $serializer;
+		$this->log = $log;
 		parent::__construct();
 	}
 
@@ -181,8 +189,15 @@ class ConsumerCommand extends Command
 			if ($consumer instanceof BunnyDeserializationErrorHandlerInterface) {
 				$consumer->handleDeserializationError($e, $message, $channel, $client);
 			} else {
-				$this->requeueAtTheEnd($message, $channel);
+				$channel->nack($message, false, false);
+				$this->log->error(sprintf(
+					"Deserialization failed, skipping. Error message: '%s', payload: '%s'",
+					$e->getMessage(),
+					$message->content
+				));
 			}
+
+			return;
 		}
 
 		$consumer->handleMessage($object, $message, $channel, $client);
@@ -192,16 +207,5 @@ class ConsumerCommand extends Command
 		if ($maxMessages !== null && $this->messages >= $maxMessages) {
 			$client->stop();
 		}
-	}
-
-	private function requeueAtTheEnd(Message $message, Channel $channel)
-	{
-		$channel->nack($message, false, false);
-		$channel->publish(
-			$message->content,
-			$message->headers,
-			$message->exchange,
-			$message->routingKey
-		);
 	}
 }
