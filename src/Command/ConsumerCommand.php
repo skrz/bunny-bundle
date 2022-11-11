@@ -13,6 +13,7 @@ use Bunny\Protocol\MethodQueueDeclareOkFrame;
 use InvalidArgumentException;
 use Skrz\Bundle\BunnyBundle\Exception\BunnyException;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyConsumerInterface;
+use Skrz\Bundle\BunnyBundle\Queue\BunnyDeserializationErrorHandlerInterface;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyInitializableInterface;
 use Skrz\Bundle\BunnyBundle\Queue\BunnyTickingConsumerInterface;
 use Skrz\Bundle\BunnyBundle\Service\BunnyManager;
@@ -21,6 +22,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Serializer\Exception\ExceptionInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /** @author Lukas Senfeld <skrz@senfeld.net> */
@@ -162,17 +164,25 @@ class ConsumerCommand extends Command
 	{
 		$data = $message->content;
 
-		switch ((string) $message->getHeader("content-type")) {
-			case ContentTypes::APPLICATION_JSON:
-				$object = $this->serializer->deserialize($data, $consumer->getMessageClassName(), 'json');
+		try {
+			switch ((string)$message->getHeader("content-type")) {
+				case ContentTypes::APPLICATION_JSON:
+					$object = $this->serializer->deserialize($data, $consumer->getMessageClassName(), 'json');
 
-				break;
-			case ContentTypes::APPLICATION_PROTOBUF:
-				$object = $this->serializer->deserialize($data, $consumer->getMessageClassName(), 'protobuf');
+					break;
+				case ContentTypes::APPLICATION_PROTOBUF:
+					$object = $this->serializer->deserialize($data, $consumer->getMessageClassName(), 'protobuf');
 
-				break;
-			default:
-				throw new BunnyException("Message does not have 'content-type' header, cannot deserialize data.");
+					break;
+				default:
+					throw new BunnyException("Message does not have 'content-type' header, cannot deserialize data.");
+			}
+		} catch (ExceptionInterface $e) {
+			if ($consumer instanceof BunnyDeserializationErrorHandlerInterface) {
+				$consumer->handleDeserializationError($e, $message, $channel, $client);
+			} else {
+				$this->requeueAtTheEnd($message, $channel);
+			}
 		}
 
 		$consumer->handleMessage($object, $message, $channel, $client);
@@ -182,5 +192,16 @@ class ConsumerCommand extends Command
 		if ($maxMessages !== null && $this->messages >= $maxMessages) {
 			$client->stop();
 		}
+	}
+
+	private function requeueAtTheEnd(Message $message, Channel $channel)
+	{
+		$channel->nack($message, false, false);
+		$channel->publish(
+			$message->content,
+			$message->headers,
+			$message->exchange,
+			$message->routingKey
+		);
 	}
 }
