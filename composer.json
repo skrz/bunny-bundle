@@ -32,9 +32,9 @@
     "require": {
         "php": ">=7.4",
         "bunny/bunny": "~0.5",
-        "symfony/console": "~3.4 | ~4.4 | ~5.3",
-        "symfony/framework-bundle": "~3.4 | ~4.4 | ~5.3",
-        "symfony/serializer": "~3.4 | ~4.4 | ~5.3"
+        "symfony/console": "~3.4 | ~4.4 | ~5.3 | ~6.3",
+        "symfony/framework-bundle": "~3.4 | ~4.4 | ~5.3 | ~6.3",
+        "symfony/serializer": "~3.4 | ~4.4 | ~5.3 | ~6.3"
     },
     "require-dev": {
         "roave/security-advisories": "dev-latest",
