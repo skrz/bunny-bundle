@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ruleset name="Skrz">
+    <description>Skrz Coding Standard</description>
+    <exclude-pattern>*/vendor/*</exclude-pattern>
+    <exclude-pattern>*/locale/*/LC_MESSAGES/*.php</exclude-pattern>
+
+    <rule ref="vendor/skrz/coding-standard/phpcs.xml"/>
+    <rule ref="vendor/skrz/coding-standard/phpcs.extended.xml"/>
+
+    <rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
+        <properties>
+            <property name="rootNamespaces" type="array">
+                <element key="src" value="Skrz\Bundle\BunnyBundle"/>
+            </property>
+        </properties>
+    </rule>
+</ruleset>

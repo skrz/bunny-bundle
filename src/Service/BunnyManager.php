@@ -1,5 +1,8 @@
 <?php
-namespace Skrz\Bundle\BunnyBundle;
+
+declare(strict_types=1);
+
+namespace Skrz\Bundle\BunnyBundle\Service;
 
 use Bunny\Channel;
 use Bunny\Client;
@@ -7,85 +10,83 @@ use Bunny\Protocol\MethodExchangeBindOkFrame;
 use Bunny\Protocol\MethodExchangeDeclareOkFrame;
 use Bunny\Protocol\MethodQueueBindOkFrame;
 use Bunny\Protocol\MethodQueueDeclareOkFrame;
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Exception;
+use Skrz\Bundle\BunnyBundle\Exception\BunnyException;
 
 class BunnyManager
 {
 
-	/** @var ContainerInterface */
-	private $container;
+	private ?Channel $channel;
 
-	/** @var Client */
-	private $client;
+	private Client $client;
 
-	/** @var Channel */
-	private $channel;
+	/**
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingTraversableTypeHintSpecification
+	 * @var array
+	 */
+	private array $config;
 
-	/** @var  Channel */
-	private $transactionalChannel;
+	private bool $setUpComplete = false;
 
-	/** @var array */
-	private $config;
+	private ?Channel $transactionalChannel;
 
-	/** @var boolean */
-	private $setUpComplete = false;
-
-	public function __construct(ContainerInterface $container, $clientServiceId, array $config)
+	/**
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingTraversableTypeHintSpecification
+	 * @param array $config
+	 */
+	public function __construct(Client $client, array $config)
 	{
-		$this->container = $container;
-		$this->clientServiceId = $clientServiceId;
 		$this->config = $config;
+		$this->client = $client;
+		$this->channel = null;
 	}
 
-	public function getClient()
-	{
-		if ($this->client === null) {
-			$this->client = $this->container->get($this->clientServiceId);
-		}
-		return $this->client;
-	}
-
-	public function createChannel()
+	public function createChannel(): Channel
 	{
 		if (!$this->getClient()->isConnected()) {
 			$this->getClient()->connect();
 		}
 
-		return $this->getClient()->channel();
+		$channel = $this->getClient()->channel();
+		assert(
+			$channel instanceof Channel,
+			new BunnyException(sprintf("bunny/bunny did not return channel but %s instead", get_class($channel)))
+		);
+
+		return $channel;
 	}
 
-	public function getChannel()
+	public function getChannel(): Channel
 	{
-		if (!$this->channel) {
+		if ($this->channel === null) {
 			$this->channel = $this->createChannel();
 		}
 
 		return $this->channel;
 	}
 
-	/**
-	 * create/return transactional channel, where messages need to be commited
-	 *
-	 * @throws BunnyException
-	 * @return Channel|\React\Promise\PromiseInterface
-	 */
-	public function getTransactionalChannel()
+	public function getClient(): Client
 	{
-		if (!$this->transactionalChannel) {
+		return $this->client;
+	}
+
+	public function getTransactionalChannel(): Channel
+	{
+		if ($this->transactionalChannel === null) {
 			$this->transactionalChannel = $this->createChannel();
 
 			// create transactional channel from normal one
 			try {
 				$this->transactionalChannel->txSelect();
-			} catch (\Exception $e) {
-				throw new BunnyException("Cannot create transaction channel.");
+			} catch (Exception $e) {
+				throw new BunnyException(sprintf("Cannot create transaction channel because: %s", $e->getMessage()));
 			}
 		}
 
 		return $this->transactionalChannel;
 	}
 
-	public function setUp()
+	public function setUp(): void
 	{
 		if ($this->setUpComplete) {
 			return;
@@ -162,5 +163,4 @@ class BunnyManager
 
 		$this->setUpComplete = true;
 	}
-
 }

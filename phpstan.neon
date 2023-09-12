@@ -1,0 +1,6 @@
+includes:
+	- phpstan-baseline.neon
+	- vendor/skrz/coding-standard/phpstan.neon
+	- vendor/skrz/coding-standard/phpstan-extended.neon
+parameters:
+	level: max

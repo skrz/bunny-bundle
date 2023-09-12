@@ -17,7 +17,7 @@ $ composer require skrz/bunny-bundle
 Then add `BunnyBundle` to Symfony Kernel:
 
 ```php
-use Skrz\Bundle\BunnyBundle\SkrzBunnyBundle;
+use Skrz\Bunny\Exception\SkrzBunnyBundle;
 
 class AppKernel
 {

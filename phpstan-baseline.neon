@@ -1,0 +1,22 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Call to an undefined method Symfony\\\\Component\\\\Config\\\\Definition\\\\Builder\\\\TreeBuilder\\:\\:root\\(\\)\\.$#"
+			count: 1
+			path: src/DependencyInjection/Configuration/Configuration.php
+
+		-
+			message: "#^Comparison operation \"\\<\" between 50307 and 40430 is always false\\.$#"
+			count: 1
+			path: src/DependencyInjection/Configuration/Configuration.php
+
+		-
+			message: "#^Method Skrz\\\\Bundle\\\\BunnyBundle\\\\Service\\\\BunnyManager\\:\\:__construct\\(\\) has parameter \\$config with no value type specified in iterable type array\\.$#"
+			count: 2
+			path: src/Service/BunnyManager.php
+
+		-
+			message: "#^Property Skrz\\\\Bundle\\\\BunnyBundle\\\\Service\\\\BunnyManager\\:\\:\\$config type has no value type specified in iterable type array\\.$#"
+			count: 1
+			path: src/Service/BunnyManager.php
+

@@ -18,26 +18,48 @@
     ],
     "minimum-stability": "stable",
     "license": "MIT",
+    "type": "symfony-bundle",
     "authors": [
         {
             "name": "Jakub Kulhan",
             "email": "jakub.kulhan@gmail.com"
+        },
+        {
+            "name": "Lukas Senfeld",
+            "email": "tech@senfeld.net"
         }
     ],
     "require": {
-        "php": ">=5.5.9",
-        "bunny/bunny": "~0.2.2|~0.4",
-        "skrz/autowiring-bundle": "~1.1|~2.0",
-        "skrz/meta": ">=3.0, <4.0"
+        "php": ">=7.4",
+        "bunny/bunny": "~0.5",
+        "symfony/console": "~3.4 | ~4.4 | ~5.3 | ~6.3",
+        "symfony/framework-bundle": "~3.4 | ~4.4 | ~5.3 | ~6.3",
+        "symfony/serializer": "~3.4 | ~4.4 | ~5.3 | ~6.3"
     },
     "require-dev": {
-        "phpunit/phpunit": "~4.6",
-        "symfony/framework-bundle": "~2.7|~3.0|~4.0",
-        "symfony/yaml": "~2.7|~3.0|~4.0"
+        "roave/security-advisories": "dev-latest",
+        "skrz/coding-standard": "~2.0"
     },
     "autoload": {
         "psr-4": {
-            "Skrz\\Bundle\\BunnyBundle\\": ""
+            "Skrz\\Bundle\\BunnyBundle\\": "src/"
+        }
+    },
+    "scripts": {
+        "phpcbf": "./vendor/bin/phpcbf ./src -n -p",
+        "phpcs": [
+            "./vendor/bin/phpcs --config-set php_version 70302",
+            "./vendor/bin/phpcs ./src -n -p -s"
+        ],
+        "phpstan": "./vendor/bin/phpstan analyse ./src",
+        "phpstan-generate-baseline": "./vendor/bin/phpstan analyse ./src --generate-baseline"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "classmap-authoritative": true,
+        "sort-packages": true,
+        "platform": {
+            "php": "7.4.22"
         }
     }
 }
